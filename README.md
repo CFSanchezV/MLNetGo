@@ -40,7 +40,7 @@ Tiene también las siguientes características:
 
 ![](./res/nn.png)
 
-Una red neuronal multicapa simple que consiste en una capa de entrada, una oculta y una de salida. Los cuatro nodos de la capa de entrada corresponde a los cuatro atributos utilizados del dataset. Asimismo, las demás capas tienen 3 nodos ya que el dataset tiene 3 clasificaciones únicas para las especies de pingüino.
+Una red neuronal multicapa simple que consiste en una capa de entrada, una oculta y una de salida. Los cuatro nodos de la capa de entrada corresponden a los cuatro atributos utilizados del dataset. Asimismo, las demás capas tienen 3 nodos ya que el dataset tiene 3 clasificaciones únicas para las especies de pingüino.
 
 ## Uso
 
