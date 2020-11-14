@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	// descarga del dataset limpio y modificado a partir del dataset de la URL: "www.kaggle.com/ashkhagan/palmer-penguins-datasetalternative-iris-dataset"
 	xCols := 4 // numero de columnas con datos
+
 	// localFile, err := os.Open("penguins_raw.csv")
 	resp, err := http.Get("https://drive.google.com/uc?export=download&id=1MjcjVMVFQNCXYUhTySrIWe9b8kn93QYd")
 
@@ -30,7 +30,7 @@ func main() {
 	// r.FieldsPerRecord = 5
 
 	for {
-		//first line has no headers... yet
+		// Primera línea no tiene cabeceras... aún
 		campos, err := r.Read()
 		if err == io.EOF {
 			break
@@ -59,17 +59,17 @@ func main() {
 
 	}
 
-	train, err := os.Create("training.csv")
+	training, err := os.Create("training.csv")
 	if err != nil {
 		panic("Error creando archivo!")
 	}
-	defer train.Close()
+	defer training.Close()
 
-	test, err := os.Create("testing.csv")
+	testing, err := os.Create("testing.csv")
 	if err != nil {
 		panic("Error creando archivo!")
 	}
-	defer test.Close()
+	defer testing.Close()
 
 	counts := make(map[int]int, 0)
 	headers := []string{"bill_length_mm,", "bill_depth_mm,", "flipper_length_mm,", "body_mass_g,", "adelie,", "gentoo,", "chinstrap"}
@@ -79,11 +79,11 @@ func main() {
 		var c int
 		if idx == 0 {
 			for _, value := range headers {
-				train.WriteString(value)
-				test.WriteString(value)
+				training.WriteString(value)
+				testing.WriteString(value)
 			}
-			train.WriteString("\n")
-			test.WriteString("\n")
+			training.WriteString("\n")
+			testing.WriteString("\n")
 		}
 
 		if i < 50 {
@@ -95,16 +95,16 @@ func main() {
 		}
 
 		if counts[c] < 100 {
-			train.WriteString(lines[i])
+			training.WriteString(lines[i])
 		} else {
-			test.WriteString(lines[i])
+			testing.WriteString(lines[i])
 		}
 
 		counts[c]++
 	}
 
-	train.Sync()
-	test.Sync()
+	training.Sync()
+	testing.Sync()
 }
 
 // atributos del dataset, extraídos de la data utilizando Dataframes
@@ -118,7 +118,7 @@ func colStats(i int) (mean float64, std float64) {
 func parseX(s string) float64 {
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		panic("Error parsing float!")
+		panic("Error al analizar número flotante!")
 	}
 
 	return f

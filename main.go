@@ -16,7 +16,7 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// neuralNet contains all of the information that defines a trained neural net.
+// neuralNet contiene la información que define una red neuronal entrenada
 type neuralNet struct {
 	config  neuralNetConfig
 	wHidden *mat.Dense
@@ -25,7 +25,7 @@ type neuralNet struct {
 	bOut    *mat.Dense
 }
 
-// neuralNetConfig: the neural net architecture and learning parameters
+// neuralNetConfig: la arquitectura de la red neuronal y los parámetros de aprendizaje
 type neuralNetConfig struct {
 	inputNeurons  int
 	hiddenNeurons int
@@ -34,17 +34,18 @@ type neuralNetConfig struct {
 	learningRate  float64
 }
 
-// sigmoid function as activation function
+// sigmoid function: como función de activación
 func sigmoid(x float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-x))
 }
 
-// sigmoidPrima: derivative of the sigmoid function for backpropagation
+// sigmoidPrima: derivada de la función sigmoidea para retropropagación
 func sigmoidPrima(x float64) float64 {
 	return sigmoid(x) * (1.0 - sigmoid(x))
 }
 
-// Read generated/available CSV files during NN setup, concurrently
+// Leer archivos CSV generados/disponibles durante la configuración de red,
+// en simultáneo a través de canales
 func makeTrainingData(ch chan *mat.Dense, inputs *mat.Dense, labels *mat.Dense) {
 	inputs, labels = makeInputsAndLabels("data/training.csv")
 	ch <- inputs
@@ -63,7 +64,7 @@ func main() {
 	startTime := time.Now()
 
 	//--------------------------TRAINING-------------------------------//
-	// The training matrices
+	// Las matrices de entrenamiento
 	ch := make(chan *mat.Dense, 2)
 	var inputs *mat.Dense
 	var labels *mat.Dense
@@ -72,7 +73,7 @@ func main() {
 	inputs = <-ch
 	labels = <-ch
 
-	// Define the network architecture, learning rate and #epochs
+	// Definir la arquitectura de red, el factor de aprendizaje y el número de epochs
 	config := neuralNetConfig{
 		inputNeurons:  4,
 		hiddenNeurons: 3,
@@ -81,7 +82,7 @@ func main() {
 		learningRate:  0.3,
 	}
 
-	// Train the neural network.
+	// Entrenar la red neuronal
 	network := newNetwork(config)
 
 	err := network.train(inputs, labels)
@@ -91,7 +92,7 @@ func main() {
 
 	//--------------------------TESTING-------------------------------//
 
-	// Form the testing matrices
+	// Formar las matrices de pruebas
 	ch2 := make(chan *mat.Dense, 2)
 	var testInputs *mat.Dense
 	var testLabels *mat.Dense
@@ -100,24 +101,24 @@ func main() {
 	testInputs = <-ch2
 	testLabels = <-ch2
 
-	// Make the predictions using the trained model.
+	// Hacer predicciones usando el modelo entrenado
 	predictions, err := network.predict(testInputs)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Calculate the accuracy of the model
+	// Calcular la precisión (accuracy) del modelo:
 	var truePosNeg int
 	numPreds, _ := predictions.Dims()
-	for i := 0; i < numPreds; i++ {
+	for i := 0; i < numPreds; i++ { // i: Filas
 
 		// Get the label.
 		labelRow := mat.Row(nil, i, testLabels)
 
-		// Show label Row		
+		// Mostrar fila de etiquetas (clasificaciones)
 		fmt.Printf("Predicción: %v\n", labelRow)
 
-		var prediction int
+		var prediction int // j: Columnas
 		for idx, label := range labelRow {
 			if label == 1.0 {
 				prediction = idx
@@ -125,36 +126,36 @@ func main() {
 			}
 		}
 
-		// Accumulate the true positive/negative count.
+		// Acumular el recuento verdadero positivo/negativo
 		if predictions.At(i, prediction) == floats.Max(mat.Row(nil, i, predictions)) {
 			truePosNeg++
 		}
 	}
-	// Execution Time
+	// Tiempo de ejecución
 	elapsed := time.Since(startTime)
 
-	// Calculate the accuracy (subset accuracy)
+	// Calcular precisión: (predicciones correctas / total de predicciones realizadas)
 	accuracy := float64(truePosNeg) / float64(numPreds)
 
 	// Mostrar predicciones para hacer comparaciones
 	fmt.Println("Comparar predicciones visualmente con últimas columnas en testing.csv")
 	fmt.Println("por ejemplo: 1.0,0.0,0.0 = [1 0 0]")
 
-	// Output the Accuracy value to standard out
+	// Mostrar el valor de precisión
 	fmt.Printf("\nPrecisión = %0.2f\n", accuracy)
 
 	log.Printf("La ejecución duró %s", elapsed)
 }
 
-// NewNetwork: initialize the neural network with given config
+// newNetwork: inicializar red neuronal con la configuración dada
 func newNetwork(config neuralNetConfig) *neuralNet {
 	return &neuralNet{config: config}
 }
 
-// train: Initialize randoms, and train neural net using backpropagate
+// train: Inicializar valores aleatorios y entrenar la red neuronal mediante retropropagación
 func (nn *neuralNet) train(x, y *mat.Dense) error {
 
-	// Initialize biases/weights with random data
+	// Inicializar bias/pesos con datos aleatorios
 	randSource := rand.NewSource(time.Now().UnixNano())
 	randGen := rand.New(randSource)
 
@@ -166,9 +167,9 @@ func (nn *neuralNet) train(x, y *mat.Dense) error {
 	wHiddenRaw := wHidden.RawMatrix().Data
 	bHiddenRaw := bHidden.RawMatrix().Data
 	wOutRaw := wOut.RawMatrix().Data
-	bOutRaw := bOut.RawMatrix().Data	
+	bOutRaw := bOut.RawMatrix().Data
 
-	// Replace matrices' RawData with random float64
+	// Reemplazar los datos base de las matrices con Float64 aleatorios
 	RawMatricesData := [][]float64{wHiddenRaw, bHiddenRaw, wOutRaw, bOutRaw}
 	for _, param := range RawMatricesData {
 		for i := range param {
@@ -176,15 +177,15 @@ func (nn *neuralNet) train(x, y *mat.Dense) error {
 		}
 	}
 
-	// To store the output of the neural network.
+	// Almacenar la salida de la red neuronal
 	output := new(mat.Dense)
 
-	// Backpropagation to adjust the weights and biases.
+	// Retropropagación para ajustar los pesos y bias
 	if err := nn.backpropagate(x, y, wHidden, bHidden, wOut, bOut, output); err != nil {
 		return err
 	}
 
-	// Define the trained neural network.
+	// Definir la red neuronal entrenada:
 	nn.wHidden = wHidden
 	nn.bHidden = bHidden
 	nn.wOut = wOut
@@ -193,17 +194,17 @@ func (nn *neuralNet) train(x, y *mat.Dense) error {
 	return nil
 }
 
-// backpropagate: implement the backpropagation concurrently
+// Retro-propagación: implementar la propagación hacia atrás concurrentemente
 func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *mat.Dense) error {
 
-	epochSlice := make([]int, nn.config.numEpochs)
-	epochLength := len(epochSlice)
+	epochLength := nn.config.numEpochs
 
-	// Wait Group for numEpochs
+	// Grupo de espera para numero de Epochs
 	var wg sync.WaitGroup
-	// Channel to send errors in case of any
+	// Canal para enviar errores en caso de que surja alguno
 	ch3 := make(chan error, 2)
 
+	// Cantidad de operaciones a esperar
 	wg.Add(epochLength)
 
 	go func() {
@@ -212,13 +213,13 @@ func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *m
 	}()
 
 	var mu sync.Mutex
-	// "lock/unlock: e.g. if accessing rand from goroutine:" mu.Lock() || rand.Float64() || mu.Unlock()
+	// "lock/unlock: por ejemplo: si accede a rand desde una rutina go:" mu.Lock() || rand.Float64() || mu.Unlock()
 
 	for i := 0; i < epochLength; i++ {
 		go func() {
 			defer wg.Done()
 
-			// Feed Forward Process
+			// Propagación hacia adelante
 			mu.Lock()
 			hiddenLayerInput := new(mat.Dense)
 			hiddenLayerInput.Mul(x, wHidden)
@@ -236,7 +237,7 @@ func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *m
 			outputLayerInput.Apply(addBOut, outputLayerInput)
 			output.Apply(applySigmoid, outputLayerInput)
 
-			// Backpropagation Process
+			// proceso de Retro-propagación
 			networkError := new(mat.Dense)
 			networkError.Sub(y, output)
 
@@ -254,7 +255,7 @@ func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *m
 			dHiddenLayer := new(mat.Dense)
 			dHiddenLayer.MulElem(errorAtHiddenLayer, slopeHiddenLayer)
 
-			// Adjust the parameters.
+			// Ajustar los parametros
 			wOutAdj := new(mat.Dense)
 			wOutAdj.Mul(hiddenLayerActivations.T(), dOutput)
 			wOutAdj.Scale(nn.config.learningRate, wOutAdj)
@@ -288,77 +289,13 @@ func (nn *neuralNet) backpropagate(x, y, wHidden, bHidden, wOut, bOut, output *m
 		}
 	}
 
-	// Loop number of epochs using backpropagation to train the model
-	// for i := 0; i < nn.config.numEpochs; i++ {
-
-	// 	// Asynchronous Forward Propagation
-	// 	hiddenLayerInput := new(mat.Dense)
-	// 	hiddenLayerInput.Mul(x, wHidden)
-	// 	addBHidden := func(_, col int, v float64) float64 { return v + bHidden.At(0, col) }
-	// 	hiddenLayerInput.Apply(addBHidden, hiddenLayerInput)
-
-	// 	hiddenLayerActivations := new(mat.Dense)
-	// 	applySigmoid := func(_, _ int, v float64) float64 { return sigmoid(v) }
-	// 	hiddenLayerActivations.Apply(applySigmoid, hiddenLayerInput)
-
-	// 	outputLayerInput := new(mat.Dense)
-	// 	outputLayerInput.Mul(hiddenLayerActivations, wOut)
-	// 	addBOut := func(_, col int, v float64) float64 { return v + bOut.At(0, col) }
-	// 	outputLayerInput.Apply(addBOut, outputLayerInput)
-	// 	output.Apply(applySigmoid, outputLayerInput)
-
-	
-	// 	// Asynchronous Backpropagation
-	// 	networkError := new(mat.Dense)
-	// 	networkError.Sub(y, output)
-
-	// 	slopeOutputLayer := new(mat.Dense)
-	// 	applySigmoidPrime := func(_, _ int, v float64) float64 { return sigmoidPrima(v) }
-	// 	slopeOutputLayer.Apply(applySigmoidPrime, output)
-	// 	slopeHiddenLayer := new(mat.Dense)
-	// 	slopeHiddenLayer.Apply(applySigmoidPrime, hiddenLayerActivations)
-
-	// 	dOutput := new(mat.Dense)
-	// 	dOutput.MulElem(networkError, slopeOutputLayer)
-	// 	errorAtHiddenLayer := new(mat.Dense)
-	// 	errorAtHiddenLayer.Mul(dOutput, wOut.T())
-
-	// 	dHiddenLayer := new(mat.Dense)
-	// 	dHiddenLayer.MulElem(errorAtHiddenLayer, slopeHiddenLayer)
-
-	// 	// Adjust the parameters.
-	// 	wOutAdj := new(mat.Dense)
-	// 	wOutAdj.Mul(hiddenLayerActivations.T(), dOutput)
-	// 	wOutAdj.Scale(nn.config.learningRate, wOutAdj)
-	// 	wOut.Add(wOut, wOutAdj)
-
-	// 	bOutAdj, err := sumAlongAxis(0, dOutput)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	bOutAdj.Scale(nn.config.learningRate, bOutAdj)
-	// 	bOut.Add(bOut, bOutAdj)
-
-	// 	wHiddenAdj := new(mat.Dense)
-	// 	wHiddenAdj.Mul(x.T(), dHiddenLayer)
-	// 	wHiddenAdj.Scale(nn.config.learningRate, wHiddenAdj)
-	// 	wHidden.Add(wHidden, wHiddenAdj)
-
-	// 	bHiddenAdj, err := sumAlongAxis(0, dHiddenLayer)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	bHiddenAdj.Scale(nn.config.learningRate, bHiddenAdj)
-	// 	bHidden.Add(bHidden, bHiddenAdj)
-	// }
-
 	return nil
 }
 
-// predict makes a prediction based on a trained neural network.
+// predict: hacer una predicción basada en una red neuronal entrenada
 func (nn *neuralNet) predict(x *mat.Dense) (*mat.Dense, error) {
 
-	// Check to make sure that our neuralNet value is a trained model.
+	// Verificar que el valor de neuralNet sea un modelo entrenado
 	if nn.wHidden == nil || nn.wOut == nil {
 		return nil, errors.New("lso pesos están vacíos")
 	}
@@ -366,10 +303,10 @@ func (nn *neuralNet) predict(x *mat.Dense) (*mat.Dense, error) {
 		return nil, errors.New("los 'bias' están vacíos")
 	}
 
-	// Define the output of the neural network
+	// Almacenar la salida de la red neuronal
 	output := new(mat.Dense)
 
-	// Single feed forward process, from train()
+	// Proceso de propagación hacia adelante: igual a train()
 	hiddenLayerInput := new(mat.Dense)
 	hiddenLayerInput.Mul(x, nn.wHidden)
 	addBHidden := func(_, col int, v float64) float64 { return v + nn.bHidden.At(0, col) }
@@ -388,7 +325,7 @@ func (nn *neuralNet) predict(x *mat.Dense) (*mat.Dense, error) {
 	return output, nil
 }
 
-// sumAlongAxis sums a matrix along a dimension, preserving the other dimension.
+// sumAlongAxis: sumar una matriz a lo largo de una dimensión, conservando la otra
 func sumAlongAxis(axis int, m *mat.Dense) (*mat.Dense, error) {
 
 	numRows, numCols := m.Dims()
@@ -418,7 +355,6 @@ func sumAlongAxis(axis int, m *mat.Dense) (*mat.Dense, error) {
 }
 
 func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
-	// Open the given dataset file
 	f, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
@@ -428,48 +364,49 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 	reader := csv.NewReader(f)
 	reader.FieldsPerRecord = 7
 
-	// Read in all of the CSV records -> [][]string
+	// Leer en todos los registros CSV -> [][]string
 	rawCSVData, err := reader.ReadAll()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// inputsData and labelsData holds the float values usesd to form matrices.
-	// fmt.Printf("Numero de inputs %d\n", len(rawCSVData))
+	// inputsData and labelsData contienen los valores flotantes que se utilizan para formar matrices
+	// fmt.Printf("Numero de inputs en dataset: %d\n", len(rawCSVData))
 
-	// 4 inputNeurons, 3 output Neurons
+	// 4 neuronas de entrada, 3 neuronas de salida (etiquetas o clasificación)
 	inputsData := make([]float64, 4*len(rawCSVData))
 	labelsData := make([]float64, 3*len(rawCSVData))
 
-	// Track the current index of matrix values
+	// Seguimiento del índice actual de valores de matriz
 	var inputsIndex int
 	var labelsIndex int
 
-	// Sequentially move the rows into a slice of floats.
+	// Mover secuencialmente las filas en un slice de flotantes
 	for idx, record := range rawCSVData {
-		// Skip Headers' row.
+		// Omitir fila de encabezados
 		if idx == 0 {
 			continue
 		}
 
-		// Loop over the float columns
+		// Bucle sobre las columnas (flotantes)
 		for i, val := range record {
 
-			// Convert the value to a float.
+			// Convertir el valor en un flotante
 			parsedVal, err := strconv.ParseFloat(val, 64)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			// Add to labelsData if relevant cols 4->(5), 5->(6) and 6->(7).
+			// columnas = {0,1,2,3,4,5,6}
+			// Agregar a Data de Etiquetas si corresponde: columnas 4, 5, y 6.
 			if i == 4 || i == 5 || i == 6 {
 				labelsData[labelsIndex] = parsedVal
 				labelsIndex++
 				continue
 			}
 
-			// Add the float value to the slice of floats.
+			// Agregar el valor flotante al segmento de flotantes
 			inputsData[inputsIndex] = parsedVal
 			inputsIndex++
 		}
@@ -478,7 +415,7 @@ func makeInputsAndLabels(fileName string) (*mat.Dense, *mat.Dense) {
 	inputs := mat.NewDense(len(rawCSVData), 4, inputsData)
 	labels := mat.NewDense(len(rawCSVData), 3, labelsData)
 
-	// Show matrices with formatter
+	// Ver matrices a utilizar con mat.Formatted
 
 	// fmt.Println("Inputs:")
 	// formatter := mat.Formatted(inputs, mat.Prefix(""))

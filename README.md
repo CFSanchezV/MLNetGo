@@ -1,6 +1,5 @@
 # Red Neuronal Multicapa en Go
 
-
 ## Dataset
 
 El dataset utilizado se llama `penguins`, y se trata de una versión simplificada del dataset original `Palmer Archipelago (Antarctica) penguin data`. Esta versión se puede generar en la subcarpeta data/ del proyecto. La versión completa del dataset original está disponible [Aquí](https://github.com/allisonhorst/palmerpenguins)
@@ -19,7 +18,6 @@ head(penguins)
 #> # … with 1 more variable: year <int>
 ```
 
-
 ### Procesamiento de dataset
 
 Se ha utilizado una versión personalizada del dataset. Editada para la predecir la clasificación de pingüinos según su especie a partir de cuatro atributos numéricos del dataset (longitud de pico, altura de pico, longitud de aleta y masa corporal)
@@ -32,15 +30,17 @@ Tiene también las siguientes características:
 
 ![](./res/penguins_info.png)
 
+El formato de dataset utilizado se muestra a continuación. Se usa la codificación **One-hot** para convertir datos categóricos (la especie) en datos numéricos para su procesamiento y uso en la red neuronal.
 
-"**bill depth**" y "**bill length**" ó altura de pico y longitud de pico respectivamente
-![](./res/bill_depth.png)
+![](./res/formatted_dataset.PNG)
+
 
 ## Arquitectura
 
 ![](./res/nn.png)
 
 Una red neuronal multicapa simple que consiste en una capa de entrada, una oculta y una de salida. Los cuatro nodos de la capa de entrada corresponden a los cuatro atributos utilizados del dataset. Asimismo, las demás capas tienen 3 nodos ya que el dataset tiene 3 clasificaciones únicas para las especies de pingüino.
+
 
 ## Uso
 
@@ -59,3 +59,8 @@ Desde el directorio raíz:
 cd data
 go run main.go
 ```
+
+### Sobre el dataset:
+
+"**bill depth**" y "**bill length**" significan altura de pico y longitud de pico respectivamente
+![](./res/bill_depth.png)
