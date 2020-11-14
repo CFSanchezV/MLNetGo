@@ -54,8 +54,8 @@ go run main.go
 
 Para volver a descargar y generar los archivos del dataset (.csv) :
 
-Desde el directorio raíz:
 ```bash
+Desde el directorio raíz:
 cd data
 go run main.go
 ```
