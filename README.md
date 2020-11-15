@@ -1,4 +1,23 @@
-# Red Neuronal Multicapa en Go
+# Retro-propagación en  Red Neuronal Multicapa
+
+## Instrucciones de Uso
+
+Para ejecutar el programa:
+```bash
+git clone https://github.com/CFSanchezV/MLNetGo.git
+cd MLNetGo
+go run main.go
+```
+
+
+Para volver a descargar y generar los archivos del dataset (.csv) :
+
+```bash
+Desde el directorio raíz:
+cd data
+go run main.go
+```
+
 
 ## Dataset
 
@@ -35,6 +54,7 @@ El formato de dataset utilizado se muestra a continuación. Se usa la codificaci
 ![](./res/formatted_dataset.PNG)
 
 
+
 ## Arquitectura
 
 ![](./res/nn.png)
@@ -42,23 +62,6 @@ El formato de dataset utilizado se muestra a continuación. Se usa la codificaci
 Una red neuronal multicapa simple que consiste en una capa de entrada, una oculta y una de salida. Los cuatro nodos de la capa de entrada corresponden a los cuatro atributos utilizados del dataset. Asimismo, las demás capas tienen 3 nodos ya que el dataset tiene 3 clasificaciones únicas para las especies de pingüino.
 
 
-## Uso
-
-Para ejecutar el programa:
-```bash
-git clone https://github.com/CFSanchezV/MLNetGo.git
-cd MLNetGo
-go run main.go
-```
-
-
-Para volver a descargar y generar los archivos del dataset (.csv) :
-
-```bash
-Desde el directorio raíz:
-cd data
-go run main.go
-```
 
 ### Sobre el dataset:
 
