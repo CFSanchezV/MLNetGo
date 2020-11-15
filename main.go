@@ -138,11 +138,11 @@ func main() {
 	accuracy := float64(truePosNeg) / float64(numPreds)
 
 	// Mostrar predicciones para hacer comparaciones
-	fmt.Println("Comparar predicciones visualmente con últimas columnas en testing.csv")
-	fmt.Println("por ejemplo: 1.0,0.0,0.0 = [1 0 0]")
+	fmt.Println("\n Se pueden comparar las predicciones visualmente con las últimas columnas en testing.csv")
+	fmt.Println("Por ejemplo: 1.0,0.0,0.0 = [1 0 0]")
 
 	// Mostrar el valor de precisión
-	fmt.Printf("\nPrecisión = %0.2f\n", accuracy)
+	fmt.Printf("\nPrecisión (accuracy) = %0.2f\n", accuracy)
 
 	log.Printf("La ejecución duró %s", elapsed)
 }

@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	fmt.Println("Descargando dataset y generando archivos: 'training.csv' y 'testing-csv'...")
+
 	xCols := 4 // numero de columnas con datos
 
 	// localFile, err := os.Open("penguins_raw.csv")
